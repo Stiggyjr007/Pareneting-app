@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Baby App – Ask a Parenting Question</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #fffdf9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #ff8c42;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      max-width: 500px;
+      padding: 12px 20px;
+      font-size: 18px;
+      border: 2px solid #ffd580;
+      border-radius: 8px;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #ffbf69;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #answer {
+      margin-top: 30px;
+      max-width: 600px;
+      background: #fff5e1;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ffddaa;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ask a Baby Question</h1>
+  <input type="text" id="question" placeholder="e.g., How often should I feed my newborn?" />
+  <button onclick="askAI()">Ask</button>
+
+  <div id="answer"></div>
+
+  <script>
+    async function askAI() {
+      const input = document.getElementById("question").value;
+      const output = document.getElementById("answer");
+      output.textContent = "Thinking...";
+
+      // Simulated AI response for now
+      setTimeout(() => {
+        if (!input.toLowerCase().includes("baby") && !input.toLowerCase().includes("newborn")) {
+          output.textContent = "Please ask a baby-related or parenting question.";
+        } else {
+          output.textContent = `Here's a helpful answer about: "${input}"\n\n👉 (This is where the AI's real answer will go once connected.)`;
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
