@@ -1,2 +1,131 @@
-index.html
-Add Baby App AI code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Baby App AI – Ask a Question</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fffdf9;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    h1 {
+      color: #ff8c42;
+      text-align: center;
+    }
+
+    .chat-box {
+      border: 2px solid #ffddaa;
+      background: #fff5e1;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      min-height: 150px;
+    }
+
+    .chat-entry {
+      margin-bottom: 15px;
+    }
+
+    .user {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .ai {
+      background: #fff8dc;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ffd580;
+      margin-top: 5px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 20px;
+      border: 2px solid #ffd580;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #ffbf69;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e09d4a;
+    }
+  </style>
+</head>
+<body>
+  <h1>👶 Baby App AI</h1>
+  <div class="chat-box" id="chatBox">
+    <div class="chat-entry">
+      <div class="ai"><strong>Baby App AI:</strong> Hi! Ask me anything about newborn care, sleep, feeding, or safety.</div>
+    </div>
+  </div>
+
+  <input type="text" id="questionInput" placeholder="Type your baby question here..." />
+  <button onclick="askQuestion()">Ask</button>
+
+  <script>
+    function askQuestion() {
+      const input = document.getElementById('questionInput');
+      const chatBox = document.getElementById('chatBox');
+      const question = input.value.trim();
+
+      if (!question) return;
+
+      const entry = document.createElement('div');
+      entry.className = 'chat-entry';
+      entry.innerHTML = `<div class="user">You: ${question}</div>`;
+      chatBox.appendChild(entry);
+
+      // Simulated AI response
+      const response = getBabyAnswer(question);
+      const aiReply = document.createElement('div');
+      aiReply.className = 'ai';
+      aiReply.innerHTML = `<strong>Baby App AI:</strong> ${response}`;
+      entry.appendChild(aiReply);
+
+      input.value = '';
+      input.focus();
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getBabyAnswer(q) {
+      q = q.toLowerCase();
+      if (q.includes("feed") || q.includes("hungry")) {
+        return "Newborns typically feed every 2 to 3 hours. Watch for hunger cues like rooting or sucking on hands.";
+      }
+      if (q.includes("sleep")) {
+        return "Newborns sleep about 14–17 hours a day, in short bursts. It's normal for them to wake up often.";
+      }
+      if (q.includes("poop") || q.includes("diaper")) {
+        return "A healthy newborn may have several poops per day. Breastfed babies may poop less often — both can be normal!";
+      }
+      if (q.includes("crying") || q.includes("colic")) {
+        return "Crying is normal, but if it's constant or high-pitched, check for discomfort, gas, or temperature. Trust your gut and call your doctor if needed.";
+      }
+      if (q.includes("bath")) {
+        return "You can sponge bathe your baby until the umbilical cord falls off. After that, 2-3 times a week is usually enough.";
+      }
+
+      return "That's a great question! Make sure it's baby- or newborn-related. I'm here to help with anything from feeding and sleep to safety and growth.";
+    }
+  </script>
+</body>
+</html>
