@@ -2,48 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Baby App AI – Ask a Question</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Baby App AI - Real ChatGPT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #fffdf9;
-      padding: 20px;
       max-width: 700px;
       margin: auto;
+      padding: 20px;
+      background: #fffdf9;
     }
-
     h1 {
       color: #ff8c42;
       text-align: center;
     }
-
-    .chat-box {
+    #chatBox {
       border: 2px solid #ffddaa;
       background: #fff5e1;
       border-radius: 12px;
       padding: 20px;
       margin-top: 20px;
-      min-height: 150px;
+      min-height: 200px;
+      max-height: 400px;
+      overflow-y: auto;
     }
-
     .chat-entry {
       margin-bottom: 15px;
     }
-
     .user {
       font-weight: bold;
       color: #333;
     }
-
     .ai {
       background: #fff8dc;
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ffd580;
       margin-top: 5px;
+      white-space: pre-wrap;
     }
-
     input[type="text"] {
       width: 100%;
       padding: 12px;
@@ -53,7 +50,6 @@
       border-radius: 8px;
       box-sizing: border-box;
     }
-
     button {
       margin-top: 10px;
       padding: 10px 20px;
@@ -64,7 +60,6 @@
       border-radius: 8px;
       cursor: pointer;
     }
-
     button:hover {
       background: #e09d4a;
     }
@@ -72,60 +67,99 @@
 </head>
 <body>
   <h1>👶 Baby App AI</h1>
-  <div class="chat-box" id="chatBox">
+
+  <div id="chatBox">
     <div class="chat-entry">
       <div class="ai"><strong>Baby App AI:</strong> Hi! Ask me anything about newborn care, sleep, feeding, or safety.</div>
     </div>
   </div>
 
   <input type="text" id="questionInput" placeholder="Type your baby question here..." />
-  <button onclick="askQuestion()">Ask</button>
+  <button id="askBtn">Ask</button>
 
   <script>
-    function askQuestion() {
-      const input = document.getElementById('questionInput');
-      const chatBox = document.getElementById('chatBox');
-      const question = input.value.trim();
+    const chatBox = document.getElementById('chatBox');
+    const input = document.getElementById('questionInput');
+    const askBtn = document.getElementById('askBtn');
 
+    // Replace this with your own OpenAI API key (keep it secret!)
+    const OPENAI_API_KEY = "YOUR_OPENAI_API_KEY";
+
+    async function askQuestion() {
+      const question = input.value.trim();
       if (!question) return;
 
+      addMessage('user', question);
+      input.value = '';
+      input.disabled = true;
+      askBtn.disabled = true;
+
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + OPENAI_API_KEY
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",  // Or use "gpt-4" or "gpt-3.5-turbo"
+            messages: [
+              { role: "system", content: "You are a helpful assistant specialized only in trusted, baby and newborn care advice." },
+              { role: "user", content: question }
+            ],
+            max_tokens: 500,
+            temperature: 0.7,
+            n: 1,
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`OpenAI error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const aiMessage = data.choices[0].message.content;
+        addMessage('ai', aiMessage);
+      } catch (err) {
+        addMessage('ai', "Sorry, I couldn't get an answer right now. Please try again later.");
+        console.error(err);
+      } finally {
+        input.disabled = false;
+        askBtn.disabled = false;
+        input.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+
+    function addMessage(sender, text) {
       const entry = document.createElement('div');
       entry.className = 'chat-entry';
-      entry.innerHTML = `<div class="user">You: ${question}</div>`;
+
+      if (sender === 'user') {
+        entry.innerHTML = `<div class="user">You: ${escapeHtml(text)}</div>`;
+      } else {
+        entry.innerHTML = `<div class="ai"><strong>Baby App AI:</strong> ${escapeHtml(text)}</div>`;
+      }
+
       chatBox.appendChild(entry);
-
-      // Simulated AI response
-      const response = getBabyAnswer(question);
-      const aiReply = document.createElement('div');
-      aiReply.className = 'ai';
-      aiReply.innerHTML = `<strong>Baby App AI:</strong> ${response}`;
-      entry.appendChild(aiReply);
-
-      input.value = '';
-      input.focus();
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function getBabyAnswer(q) {
-      q = q.toLowerCase();
-      if (q.includes("feed") || q.includes("hungry")) {
-        return "Newborns typically feed every 2 to 3 hours. Watch for hunger cues like rooting or sucking on hands.";
-      }
-      if (q.includes("sleep")) {
-        return "Newborns sleep about 14–17 hours a day, in short bursts. It's normal for them to wake up often.";
-      }
-      if (q.includes("poop") || q.includes("diaper")) {
-        return "A healthy newborn may have several poops per day. Breastfed babies may poop less often — both can be normal!";
-      }
-      if (q.includes("crying") || q.includes("colic")) {
-        return "Crying is normal, but if it's constant or high-pitched, check for discomfort, gas, or temperature. Trust your gut and call your doctor if needed.";
-      }
-      if (q.includes("bath")) {
-        return "You can sponge bathe your baby until the umbilical cord falls off. After that, 2-3 times a week is usually enough.";
-      }
-
-      return "That's a great question! Make sure it's baby- or newborn-related. I'm here to help with anything from feeding and sleep to safety and growth.";
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
+
+    askBtn.addEventListener('click', askQuestion);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        askQuestion();
+      }
+    });
   </script>
 </body>
 </html>
